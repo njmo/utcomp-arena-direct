@@ -2132,8 +2132,14 @@ exec function VoteNo()
     }
 }
 
+// Modified by arena.direct on 2026-11-23 to use the external match ready state.
 exec function Ready()
 {
+    if (RepInfo != None && RepInfo.bExternalMatchControl)
+    {
+        ServerSay("!ready");
+        return;
+    }
     if(UTCompPRI!=None)
         UTCompPRI.bIsReady=True;
     UTCompPRI.Ready();
@@ -2150,6 +2156,7 @@ exec function Ready()
 
 exec function NotReady(optional bool bSilent)
 {
+    if (RepInfo != None && RepInfo.bExternalMatchControl && !bSilent) return;
     if(UTCompPRI!=None)
         UTCompPRI.bIsReady=False;
     UTCompPRI.NotReady();

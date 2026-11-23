@@ -233,8 +233,14 @@ function ClearStats()
     TotalDamageG=0;
 }
 
+// Modified by arena.direct on 2026-11-23 to retain match nicknames.
 function SetColoredName(string S)
 {
+    local BS_xPlayer Player;
+    Player = BS_xPlayer(Owner);
+    if (Player != None && Player.RepInfo != None && Player.RepInfo.bExternalMatchControl
+        && (Player.PlayerReplicationInfo == None || Player.StripColorCodes(S) != Player.PlayerReplicationInfo.PlayerName))
+        return;
     ColoredName=S;
 }
 

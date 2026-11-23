@@ -1,3 +1,4 @@
+// Modified by arena.direct on 2026-11-23 to show the Arena ready state.
 
 
 class UTComp_ScoreBoard extends UTComp_ScoreBoardDM;
@@ -454,14 +455,14 @@ simulated function DrawPlayerInformation(Canvas C, PlayerReplicationInfo PRI, fl
 
     if(default.benablecolorednamesonscoreboard && uPRI!=None && uPRI.ColoredName !="")
     {
-        if ( !TryDrawEmoteName(C, uPRI.ColoredName$AdminString) )
-            C.DrawTextClipped(uPRI.ColoredName$AdminString);
+        if ( !TryDrawEmoteName(C, ArenaReadyName(uPRI.ColoredName$AdminString, PRI)) )
+            C.DrawTextClipped(ArenaReadyName(uPRI.ColoredName$AdminString, PRI));
     }
     else
     {
         C.SetDrawColor(255,255,255,255);
-        if ( !TryDrawEmoteName(C, PRI.PlayerName$AdminString) )
-            C.DrawTextClipped(PRI.PlayerName$AdminString);
+        if ( !TryDrawEmoteName(C, ArenaReadyName(PRI.PlayerName$AdminString, PRI)) )
+            C.DrawTextClipped(ArenaReadyName(PRI.PlayerName$AdminString, PRI));
     }
     C.ClipX=OldClipX;
 

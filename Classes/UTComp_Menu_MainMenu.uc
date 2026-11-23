@@ -1,4 +1,5 @@
 
+// Modified by arena.direct on 2026-11-23 to add fork attribution to F5.
 class UTComp_Menu_MainMenu extends PopupPageBase;
 
 #exec TEXTURE IMPORT NAME=Display95 GROUP=GUI FILE=Textures\Display95.dds MIPS=off ALPHA=1 DXT=5
@@ -6,6 +7,8 @@ class UTComp_Menu_MainMenu extends PopupPageBase;
 
 var automated array<GUIButton> UTCompMenuButtons;
 var automated GUITabControl c_Main;
+var automated GUILabel ArenaModeCredit;
+var automated GUILabel ArenaSourceCredit;
 var automated FloatingImage i_FrameBG2;
 var UTComp_Settings Settings;
 var UTComp_HUDSettings HUDSettings;
@@ -97,6 +100,7 @@ function vector SpinnyPaneLoc(Canvas C, GUIImage Bounds, vector CamPos, vector F
 function InitComponent(GUIController MyController, GUIComponent MyComponent)
 {
     local int i;
+    local BS_xPlayer Player;
 
     MyController.RegisterStyle(class'STY_WSButton', true);
     MyController.RegisterStyle(class'STY_WSButtonTab', true);
@@ -118,6 +122,9 @@ function InitComponent(GUIController MyController, GUIComponent MyComponent)
 
     Settings = BS_xPlayer(PlayerOwner()).Settings;
     HUDSettings = BS_xPlayer(PlayerOwner()).HUDSettings;
+    Player = BS_xPlayer(PlayerOwner());
+    if (Player.RepInfo != None && Player.RepInfo.bExternalMatchControl)
+        UTCompMenuButtons[6].Caption = "Match";
 
     // Reset every tab button to the tab style (which doesn't highlight on focus, only
     // on hover), then give only this menu's button the always-highlighted active style.
@@ -153,7 +160,12 @@ function bool InternalOnClick(GUIComponent C)
         PlayerOwner().ClientReplaceMenu(string(class'UTComp_Menu_HUD'));
 
     else if(C==UTCompMenuButtons[6])
-        PlayerOwner().ClientReplaceMenu(string(class'UTComp_Menu_Voting'));
+    {
+        if (BS_xPlayer(PlayerOwner()).RepInfo != None && BS_xPlayer(PlayerOwner()).RepInfo.bExternalMatchControl)
+            PlayerOwner().ClientReplaceMenu(string(class'ArenaComp_MatchMenu'));
+        else
+            PlayerOwner().ClientReplaceMenu(string(class'UTComp_Menu_Voting'));
+    }
 
     else if(C==UTCompMenuButtons[7])
         PlayerOwner().ClientReplaceMenu(string(class'UTComp_Menu_AutoDemoSS'));
@@ -413,6 +425,32 @@ defaultproperties
   /*   bResizeWidthAllowed=False
      bResizeHeightAllowed=False
      bMoveAllowed=False      */
+     Begin Object Class=GUILabel Name=ArenaModeCreditLabel
+         Caption="arena.direct Comp Mode - Based on WSUTComp V33"
+         StyleName="WSLabelWhite"
+         TextAlign=TXTA_Right
+         WinLeft=0.450000
+         WinTop=0.853000
+         WinWidth=0.460000
+         WinHeight=0.022000
+         bBoundToParent=False
+         bScaleToParent=False
+     End Object
+     ArenaModeCredit=GUILabel'ArenaModeCreditLabel'
+
+     Begin Object Class=GUILabel Name=ArenaSourceCreditLabel
+         Caption="github.com/njmo/utcomp-arena-direct"
+         StyleName="WSLabelWhite"
+         TextAlign=TXTA_Right
+         WinLeft=0.450000
+         WinTop=0.875000
+         WinWidth=0.460000
+         WinHeight=0.022000
+         bBoundToParent=False
+         bScaleToParent=False
+     End Object
+     ArenaSourceCredit=GUILabel'ArenaSourceCreditLabel'
+
      ActiveMenuButton=-1
      bRequire640x480=True
      bAllowedAsLast=True

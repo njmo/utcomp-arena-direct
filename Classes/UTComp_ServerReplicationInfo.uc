@@ -2,7 +2,9 @@
 
 class UTComp_ServerReplicationInfo extends ReplicationInfo;
 
+// Modified by arena.direct on 2026-11-23 to replicate the match-controls mode.
 var bool bEnableVoting;
+var bool bExternalMatchControl;
 var byte EnableBrightSkinsMode;
 var bool bEnableClanSkins;
 var bool bEnableTeamOverlay;
@@ -93,7 +95,7 @@ var bool bSpectatorVoiceChat;
 replication
 {
     reliable if(Role==Role_Authority)
-        bEnableVoting, EnableBrightSkinsMode, EnableHitSoundsMode,
+        bExternalMatchControl, bEnableVoting, EnableBrightSkinsMode, EnableHitSoundsMode,
         bEnableClanSkins, bEnableTeamOverlay, bEnablePowerupsOverlay,
         bEnableWarmup, bEnableBrightskinsVoting,
         bEnableHitsoundsVoting, bEnableTeamOverlayVoting, bEnablePowerupsOverlayVoting,

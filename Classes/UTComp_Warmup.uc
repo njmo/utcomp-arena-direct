@@ -2,7 +2,9 @@
 class UTComp_Warmup extends ReplicationInfo;
 
 //General Warmup Settings
+// Modified by arena.direct on 2026-11-23 for externally controlled warmup.
 var bool bInWarmup;
+var bool bExternalMatchControl;
 var bool bInFinalCountdown;
 var int iFinalCountDown;
 var int iWarmupTime; //0=unlimited, #=time in seconds
@@ -216,6 +218,12 @@ function Timer()
 
     if(!bInWarmup)
         return;
+    if(bExternalMatchControl)
+    {
+        ResetKills();
+        ResetCore();
+        return;
+    }
     if(bInFinalCountDown)
         WarmupFinalization(iFinalCountDown);
     else if(ReadyCheck() || NoTimeLeftCheck())
@@ -342,6 +350,22 @@ function KillAllPlayers()
     SavedBots=Level.Game.NumBots;
     if(!Level.Game.IsA('UTComp_ClanArena'))
         Level.Game.KillBots(Level.Game.NumBots+1);
+}
+
+function FinishExternalWarmup()
+{
+    if (!bInWarmup || !bExternalMatchControl) return;
+    bInWarmup = false;
+    bWarmupEnded = true;
+    SetTimer(0.0, false);
+    ResetProjectiles();
+    ResetWeaponPickups();
+    NotifySelf();
+    NotifyPlayers();
+    ResetStats();
+    ResetKills();
+    RemoveSpawnVisualization();
+    AutoDemoRecord();
 }
 
 function EndWarmup(bool bIsRestart)

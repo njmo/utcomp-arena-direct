@@ -1,3 +1,4 @@
+// Modified by arena.direct on 2026-11-23 for externally managed matches.
 class MutUTComp extends Mutator
     PerObjectConfig;
 
@@ -6,6 +7,7 @@ class MutUTComp extends Mutator
 #exec OBJ LOAD FILE="Textures\TeamColorTex.utx" PACKAGE=WSUTComp
 
 var config bool bEnableVoting;
+var config bool bExternalMatchControl;
 var config bool bEnableBrightskinsVoting;
 var config bool bEnableHitsoundsVoting;
 var config bool bEnableWarmupVoting;
@@ -829,12 +831,23 @@ function SetupWarmup()
     WarmupInfo.iWarmupTime=WarmupTime;
 
     WarmupInfo.fReadyPercent=WarmupReadyPercentRequired;
+    WarmupInfo.bExternalMatchControl = bExternalMatchControl;
     WarmupInfo.InitializeWarmup();
+}
+
+function Mutate(string Command, PlayerController Sender)
+{
+    if (Sender == None && bExternalMatchControl && Command == "ArenaFinishWarmup")
+    {
+        if (WarmupInfo != None) WarmupInfo.FinishExternalWarmup();
+        return;
+    }
+    Super.Mutate(Command, Sender);
 }
 
 function SetupVoting()
 {
-    if(!bEnableVoting)
+    if(!bEnableVoting || bExternalMatchControl)
         return;
     if(VotingClass==None)
     {
@@ -1011,7 +1024,8 @@ function SpawnReplicationClass()
     if(RepInfo==None)
         RepInfo=Spawn(class'UTComp_ServerReplicationInfo', self);
     
-    RepInfo.bEnableVoting=bEnableVoting;
+    RepInfo.bExternalMatchControl=bExternalMatchControl;
+    RepInfo.bEnableVoting=bEnableVoting && !bExternalMatchControl;
     RepInfo.EnableBrightSkinsMode=Clamp(EnableBrightSkinsMode,1,3);
     RepInfo.bEnableClanSkins=bEnableClanSkins;
     RepInfo.bEnableTeamOverlay=bEnableTeamOverlay;
@@ -2280,6 +2294,7 @@ defaultproperties
      EnableHitSoundsMode=2
      
      bEnableWarmup=True
+     bExternalMatchControl=True
      WarmupClass=class'UTComp_Warmup'
      WarmupReadyPercentRequired=100.000000
      bEnableWeaponStats=True

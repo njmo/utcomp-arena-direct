@@ -1,4 +1,5 @@
 
+// Modified by arena.direct on 2026-11-23 to route Ready to the match host.
 class UTComp_Menu_OpenedMenu extends UTComp_Menu_MainMenu;
 
 var automated array<GUILabel> l_Mode;
@@ -49,7 +50,7 @@ function RandomCrap()
      bu_Ready.Caption="Ready";
      bu_NotReady.Caption="Not Ready";
      bu_Ready.bVisible=true;
-     bu_NotReady.bVisible=true;
+     bu_NotReady.bVisible=RepInfo == None || !RepInfo.bExternalMatchControl;
    }
    else
    {
@@ -79,6 +80,8 @@ function bool InternalOnClick( GUIComponent C )
                            {
                               if(PlayerOwner().PlayerReplicationInfo.bOnlySpectator)
                                 BS_xPlayer(PlayerOwner()).SpecLockRed();
+                              else if (RepInfo != None && RepInfo.bExternalMatchControl)
+                                PlayerOwner().ServerSay("!ready");
                               else
                                 BS_xPlayer(PlayerOwner()).Ready();
                            }

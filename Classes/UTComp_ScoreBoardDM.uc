@@ -1,6 +1,9 @@
+// Modified by arena.direct on 2026-11-23 to show the Arena ready state.
 
 
 class utcomp_ScoreBoardDM extends ScoreBoardDeathMatch;
+
+var ReplicationInfo ArenaMatchState;
 
 var font SmallerFont;
 var UTComp_ServerReplicationInfo RepInfo;
@@ -21,6 +24,15 @@ var transient float NextKeyStringTime;
 
 // Lookups shared by every row, done once at the top of UpdateScoreBoard instead
 // of once per row.
+simulated function string ArenaReadyName(string DisplayName, PlayerReplicationInfo PRI)
+{
+    if (ArenaMatchState == None || ArenaMatchState.bDeleteMe)
+        ArenaMatchState = class'ArenaComp_ClientState'.static.MatchFor(PlayerController(Owner));
+    if (ArenaMatchState == None) return DisplayName;
+    return class'ArenaComp_ClientState'.static.ScoreboardName(
+        DisplayName, PRI, byte(ArenaMatchState.GetPropertyText("Phase")));
+}
+
 simulated function PrepareFrame(Canvas C)
 {
     local BS_xPlayer P;
@@ -468,6 +480,7 @@ simulated event UpdateScoreBoard(Canvas Canvas)
         }
         else
             playername[i] = GRI.PRIArray[i].PlayerName;
+		playername[i] = ArenaReadyName(playername[i], GRI.PRIArray[i]);
 		Canvas.StrLen(playername[i], XL, YL);
 		if ( XL > FMax(LongestNameLength,MaxNamePos) )
 		{
@@ -486,6 +499,7 @@ simulated event UpdateScoreBoard(Canvas Canvas)
         }
         else
             playername[OwnerOffset] = GRI.PRIArray[OwnerOffset].PlayerName;
+		playername[OwnerOffset] = ArenaReadyName(playername[OwnerOffset], GRI.PRIArray[OwnerOffset]);
 		Canvas.StrLen(playername[OwnerOffset], XL, YL);
 		if ( XL > FMax(LongestNameLength,MaxNamePos) )
 		{
